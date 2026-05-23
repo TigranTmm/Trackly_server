@@ -1,8 +1,7 @@
-package com.example
+package com.example.pluguns
 
 import io.ktor.server.application.*
 import io.ktor.serialization.kotlinx.json.*
-import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 
 fun Application.configureSerialization() {
