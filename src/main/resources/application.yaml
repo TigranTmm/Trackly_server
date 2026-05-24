@@ -6,3 +6,13 @@ ktor:
       - com.example.pluguns.SerializationKt.configureSerialization
       - com.example.pluguns.SecurityKt.configureSecurity
       - com.example.pluguns.RoutingKt.configureRouting
+      - com.example.pluguns.DatabaseKt.configureDatabase
+
+database:
+  url: "jdbc:postgresql://localhost:5432/trackly_db"
+  user: "postgres"
+  password: "1234"
+  driver: "org.postgresql.Driver"
+
+
+kind: Application
