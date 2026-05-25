@@ -14,5 +14,11 @@ database:
   password: "1234"
   driver: "org.postgresql.Driver"
 
+jwt:
+  secret: "trackly_super_secret_key"
+  issuer: "trackly_server"
+  audience: "trackly_users"
+  realm: "Trackly"
+
 
 kind: Application

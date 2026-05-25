@@ -1,17 +1,16 @@
 [versions]
 exposed = "1.2.0"
-h2 = "2.4.240"
+bcrypt = "0.10.2"
 kotlin = "2.3.21"
 logback = "1.5.21"
 
 [libraries]
 exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
-exposed-r2dbc = { module = "org.jetbrains.exposed:exposed-r2dbc", version.ref = "exposed" }
 exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
-h2database-h2 = { module = "com.h2database:h2", version.ref = "h2" }
-h2database-r2dbc = { module = "io.r2dbc:r2dbc-h2", version = "1.1.0.RELEASE" }
+exposed-java-time = { module = "org.jetbrains.exposed:exposed-java-time", version.ref = "exposed" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 postgresql = { module = "org.postgresql:postgresql", version = "42.7.10" }
+bcrypt = { module ="at.favre.lib:bcrypt", version.ref = "bcrypt" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

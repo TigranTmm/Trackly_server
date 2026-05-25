@@ -7,10 +7,10 @@ import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 
 fun Application.configureSecurity() {
-    val jwtAudience = "jwt-audience"
-    val jwtDomain = "https://jwt-provider-domain/"
-    val jwtRealm = "ktor sample app"
-    val jwtSecret = "secret"
+    val jwtAudience = "trackly_users"
+    val jwtDomain = "trackly_server"
+    val jwtRealm = "Trackly"
+    val jwtSecret = "trackly_super_secret_key"
     authentication {
         jwt {
             realm = jwtRealm
@@ -22,7 +22,10 @@ fun Application.configureSecurity() {
                     .build()
             )
             validate { credential ->
-                if (credential.payload.audience.contains(jwtAudience)) JWTPrincipal(credential.payload) else null
+                if (credential.payload.getClaim("userId").asLong() != null) {
+                    JWTPrincipal(credential.payload)
+                }
+                else null
             }
         }
     }

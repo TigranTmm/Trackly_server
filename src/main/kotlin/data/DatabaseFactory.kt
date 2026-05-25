@@ -1,7 +1,10 @@
-package com.example.database
+package com.example.data
 
+import com.example.data.tables.UsersTable
 import io.ktor.server.application.ApplicationEnvironment
 import org.jetbrains.exposed.v1.jdbc.Database
+import org.jetbrains.exposed.v1.jdbc.SchemaUtils
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 object DatabaseFactory {
 
@@ -20,6 +23,10 @@ object DatabaseFactory {
                 .property("database.password")
                 .getString()
         )
+
+        transaction {
+            SchemaUtils.create(UsersTable)
+        }
 
         println("Database connected")
     }

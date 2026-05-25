@@ -26,8 +26,10 @@ dependencies {
     implementation(ktorLibs.server.netty)
     implementation(libs.exposed.core)
     implementation(libs.exposed.jdbc)
+    implementation(libs.exposed.java.time)
     implementation(libs.logback.classic)
     implementation(libs.postgresql)
+    implementation(libs.bcrypt)
 
     testImplementation(kotlin("test"))
     testImplementation(ktorLibs.server.testHost)
