@@ -1,10 +1,10 @@
 package com.example.routes
 
 import com.example.domain.service.AuthService
-import com.example.dto.LoginRequest
-import com.example.dto.LoginResponse
-import com.example.dto.RegisterRequest
-import com.example.dto.RequestResponce
+import com.example.dto.user.LoginRequest
+import com.example.dto.user.LoginResponse
+import com.example.dto.user.RegisterRequest
+import com.example.dto.user.RequestResponce
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
@@ -14,6 +14,7 @@ import io.ktor.server.routing.post
 fun Route.authRoutes(
     authService: AuthService
 ) {
+
     post("/register") {
         try {
             val request = call.receive<RegisterRequest>()

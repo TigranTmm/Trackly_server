@@ -1,5 +1,6 @@
 package com.example.data
 
+import com.example.data.tables.SpheresTable
 import com.example.data.tables.UsersTable
 import io.ktor.server.application.ApplicationEnvironment
 import org.jetbrains.exposed.v1.jdbc.Database
@@ -25,7 +26,7 @@ object DatabaseFactory {
         )
 
         transaction {
-            SchemaUtils.create(UsersTable)
+            SchemaUtils.create(UsersTable, SpheresTable)
         }
 
         println("Database connected")

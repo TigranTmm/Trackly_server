@@ -3,6 +3,7 @@ package com.example.domain.repository
 import com.example.domain.models.User
 
 interface UserRepository {
+
     suspend fun createUser (
         email: String,
         passwordHash: String

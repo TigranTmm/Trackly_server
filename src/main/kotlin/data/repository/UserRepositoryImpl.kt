@@ -9,6 +9,7 @@ import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 class UserRepositoryImpl : UserRepository {
+
     override suspend fun createUser(
         email: String,
         passwordHash: String

@@ -11,9 +11,11 @@ fun Application.configureSecurity() {
     val jwtDomain = "trackly_server"
     val jwtRealm = "Trackly"
     val jwtSecret = "trackly_super_secret_key"
+
     authentication {
         jwt {
             realm = jwtRealm
+
             verifier(
                 JWT
                     .require(Algorithm.HMAC256(jwtSecret))
@@ -21,6 +23,7 @@ fun Application.configureSecurity() {
                     .withIssuer(jwtDomain)
                     .build()
             )
+
             validate { credential ->
                 if (credential.payload.getClaim("userId").asLong() != null) {
                     JWTPrincipal(credential.payload)

@@ -1,8 +1,11 @@
 package com.example.pluguns
 
+import com.example.data.repository.SphereRepositoryImpl
 import com.example.data.repository.UserRepositoryImpl
 import com.example.domain.service.AuthService
+import com.example.domain.service.SphereService
 import com.example.routes.authRoutes
+import com.example.routes.sphereRoutes
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.*
 import io.ktor.server.auth.authenticate
@@ -16,8 +19,13 @@ fun Application.configureRouting() {
     val userRepository = UserRepositoryImpl()
     val authService = AuthService(userRepository)
 
+    val sphereRepository = SphereRepositoryImpl()
+    val sphereService = SphereService(sphereRepository)
+
     routing {
         authRoutes(authService)
+
+        sphereRoutes(sphereService)
 
         authenticate {
             get("/me") {
@@ -33,8 +41,6 @@ fun Application.configureRouting() {
                     return@get
                 }
 
-                println(principal?.payload?.claims)
-
                 call.respond(
                     HttpStatusCode.OK,
                     mapOf(
@@ -44,4 +50,17 @@ fun Application.configureRouting() {
             }
         }
     }
+}
+
+
+/** Getting user id **/
+fun ApplicationCall.getUserId(): Long {
+
+    val principal = principal<JWTPrincipal>()
+
+    return principal
+        ?.payload
+        ?.getClaim("userId")
+        ?.asLong()
+        ?: throw IllegalArgumentException("InvalidToken")
 }

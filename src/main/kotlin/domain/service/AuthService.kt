@@ -8,6 +8,7 @@ import com.example.domain.security.PasswordHasher
 class AuthService(
     private val repository: UserRepository
 ) {
+
     suspend fun register(
         email: String,
         password: String
@@ -31,7 +32,7 @@ class AuthService(
         val user = repository.getByEmail(email)
             ?: throw IllegalArgumentException("UserWithThisEmailDoesNotExist")
 
-        // Check f the password correct
+        // Check if the password correct
         val isPasswordCorrect = PasswordHasher.verify(password, user.passwordHash)
         if (!isPasswordCorrect) throw IllegalArgumentException("PasswordIsIncorrect")
 

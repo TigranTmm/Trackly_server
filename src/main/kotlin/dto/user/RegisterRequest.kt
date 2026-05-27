@@ -1,9 +1,9 @@
-package com.example.dto
+package com.example.dto.user
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class LoginRequest(
+data class RegisterRequest (
     val email: String,
     val password: String
 )
