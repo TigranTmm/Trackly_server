@@ -1,14 +1,12 @@
 package com.example.routes
 
 import com.example.domain.models.toResponse
-import com.example.domain.service.SphereService
-import com.example.dto.sphere.SphereRequest
+import com.example.domain.service.TaskService
+import com.example.dto.task.TaskRequest
 import com.example.pluguns.getIdFromRoute
 import com.example.pluguns.getUserId
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
-import io.ktor.server.auth.jwt.JWTPrincipal
-import io.ktor.server.auth.principal
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -17,97 +15,30 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.put
 
-fun Route.sphereRoutes(
-    sphereService: SphereService
+fun Route.taskRoutes(
+    taskService: TaskService
 ) {
     authenticate {
 
-        // Adding sphere
-        post("/spheres") {
+        // Adding task
+        post("/spheres/{id}/tasks") {
             try {
                 // Getting iser id
                 val userId = call.getUserId()
-
-                val request = call.receive<SphereRequest>()
-
-                // Creating sphere
-                val sphere = sphereService.createSphere(
-                    userId = userId,
-                    title = request.title,
-                    colorKey = request.colorKey,
-                    iconKey = request.iconKey,
-                    hasTasks = request.hasTasks
-                )
-
-                call.respond(sphere.toResponse())
-
-            } catch (e: IllegalArgumentException) {
-                call.respond(
-                    HttpStatusCode.BadRequest,
-                    e.message ?: ""
-                )
-            }
-        }
-
-        // Getting all spheres
-        get("/spheres") {
-            try {
-                // Getting iser id
-                val userId = call.getUserId()
-
-                call.respond(
-                    sphereService.getUserSpheres(userId)
-                        .map { it.toResponse() }
-                )
-            } catch (e: IllegalArgumentException) {
-                call.respond(
-                    HttpStatusCode.BadRequest,
-                    e.message ?: ""
-                )
-            }
-        }
-
-        // Getting sphere by id
-        get("/spheres/{id}") {
-            try {
                 // Getting sphere id
                 val sphereId = call.getIdFromRoute("id")
-                // Getting iser id
-                val userId = call.getUserId()
 
-                val sphere = sphereService.getSphereById(userId, sphereId)
+                val request = call.receive<TaskRequest>()
 
-                call.respond(sphere.toResponse())
-
-            } catch (e: IllegalArgumentException) {
-                call.respond(
-                    HttpStatusCode.BadRequest,
-                    e.message ?: ""
-                )
-            }
-
-        }
-
-        // Updating sphere by id
-        put("/spheres/{id}") {
-            try {
-                // Getting sphere id
-                val sphereId = call.getIdFromRoute("id")
-                // Getting iser id
-                val userId = call.getUserId()
-
-                val sphere = call.receive<SphereRequest>()
-
-                val newSphere = sphereService.updateSphere(
+                val task = taskService.createTask(
                     userId = userId,
                     sphereId = sphereId,
-                    newTitle = sphere.title,
-                    newColorKey = sphere.colorKey,
-                    newIconKey = sphere.iconKey,
-                    newHasTasks = sphere.hasTasks
+                    content = request.content,
+                    priority = request.priority,
+                    isCompleted = request.isCompleted
                 )
 
-                call.respond(newSphere.toResponse())
+                call.respond(task.toResponse())
 
             } catch (e: IllegalArgumentException) {
                 call.respond(
@@ -115,18 +46,93 @@ fun Route.sphereRoutes(
                     e.message ?: ""
                 )
             }
-
         }
 
-        // Deleting sphere by id
-        delete("/spheres/{id}") {
+        // Getting all tasks
+        get("/spheres/{id}/tasks") {
             try {
-                // Getting sphere id
-                val sphereId = call.getIdFromRoute("id")
                 // Getting iser id
                 val userId = call.getUserId()
+                // Getting sphere id
+                val sphereId = call.getIdFromRoute("id")
 
-                sphereService.deleteSphere(userId, sphereId)
+                call.respond(
+                    taskService.getAllTasksOfSphere(userId, sphereId)
+                        .map { it.toResponse() }
+                )
+
+            } catch (e: IllegalArgumentException) {
+                call.respond(
+                    HttpStatusCode.BadRequest,
+                    e.message ?: ""
+                )
+            }
+        }
+
+        // Getting task by id
+        get("/spheres/{id}/tasks/{taskId}") {
+            try {
+                // Getting iser id
+                val userId = call.getUserId()
+                // Getting sphere id
+                val sphereId = call.getIdFromRoute("id")
+                // Getting task id
+                val taskId = call.getIdFromRoute("taskId")
+
+                val task = taskService.getTaskById(userId, sphereId, taskId)
+
+                call.respond(task.toResponse())
+
+            } catch (e: IllegalArgumentException) {
+                call.respond(
+                    HttpStatusCode.BadRequest,
+                    e.message ?: ""
+                )
+            }
+        }
+
+        // Updating task
+        put("/spheres/{id}/tasks/{taskId}") {
+            try {
+                // Getting iser id
+                val userId = call.getUserId()
+                // Getting sphere id
+                val sphereId = call.getIdFromRoute("id")
+                // Getting task id
+                val taskId = call.getIdFromRoute("taskId")
+
+                val request = call.receive<TaskRequest>()
+
+                val newTask = taskService.updateTask(
+                    userId = userId,
+                    sphereId = sphereId,
+                    taskId = taskId,
+                    newContent = request.content,
+                    newPriority = request.priority,
+                    newIsCompleted = request.isCompleted
+                )
+
+                call.respond(newTask.toResponse())
+
+            } catch (e: IllegalArgumentException) {
+                call.respond(
+                    HttpStatusCode.BadRequest,
+                    e.message ?: ""
+                )
+            }
+        }
+
+        // Deleting task
+        delete("/spheres/{id}/tasks/{taskId}") {
+            try {
+                // Getting iser id
+                val userId = call.getUserId()
+                // Getting sphere id
+                val sphereId = call.getIdFromRoute("id")
+                // Getting task id
+                val taskId = call.getIdFromRoute("taskId")
+
+                taskService.deleteTask(userId, sphereId, taskId)
 
                 call.respond(HttpStatusCode.NoContent)
 
@@ -137,6 +143,5 @@ fun Route.sphereRoutes(
                 )
             }
         }
-
     }
 }

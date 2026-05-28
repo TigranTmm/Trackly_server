@@ -1,11 +1,14 @@
 package com.example.pluguns
 
 import com.example.data.repository.SphereRepositoryImpl
+import com.example.data.repository.TaskRepositoryImpl
 import com.example.data.repository.UserRepositoryImpl
 import com.example.domain.service.AuthService
 import com.example.domain.service.SphereService
+import com.example.domain.service.TaskService
 import com.example.routes.authRoutes
 import com.example.routes.sphereRoutes
+import com.example.routes.taskRoutes
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.*
 import io.ktor.server.auth.authenticate
@@ -22,10 +25,18 @@ fun Application.configureRouting() {
     val sphereRepository = SphereRepositoryImpl()
     val sphereService = SphereService(sphereRepository)
 
+    val taskRepository = TaskRepositoryImpl()
+    val taskService = TaskService(
+        taskRepository = taskRepository,
+        sphereRepository = sphereRepository
+    )
+
     routing {
         authRoutes(authService)
 
         sphereRoutes(sphereService)
+
+        taskRoutes(taskService)
 
         authenticate {
             get("/me") {
@@ -48,6 +59,25 @@ fun Application.configureRouting() {
                     )
                 )
             }
+
+            /** Testing existsByIdAndUserId method
+            get("/sphere/{id}/") {
+                try {
+                    val userId = call.getUserId()
+                    val sphereId = call.getIdFromRoute()
+
+                    val isExist = sphereRepository.existsByIdAndUserId(userId, sphereId)
+
+                    if (isExist) call.respond("Sphere${sphereId}IsExist")
+                    else call.respond(HttpStatusCode.BadRequest, "SphereIsNotExist")
+                } catch (e: IllegalArgumentException) {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        e.message ?: ""
+                    )
+                }
+            }
+            **/
         }
     }
 }
@@ -55,7 +85,6 @@ fun Application.configureRouting() {
 
 /** Getting user id **/
 fun ApplicationCall.getUserId(): Long {
-
     val principal = principal<JWTPrincipal>()
 
     return principal
@@ -63,4 +92,13 @@ fun ApplicationCall.getUserId(): Long {
         ?.getClaim("userId")
         ?.asLong()
         ?: throw IllegalArgumentException("InvalidToken")
+}
+
+
+/** Getting id from route **/
+fun ApplicationCall.getIdFromRoute(tag: String): Long {
+    val sphereId = parameters[tag]?.toLongOrNull()
+        ?: throw IllegalArgumentException("InvalidToken")
+
+    return sphereId
 }

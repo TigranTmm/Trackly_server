@@ -26,4 +26,6 @@ interface SphereRepository {
     ): Sphere?
 
     suspend fun deleteSphere(userId: Long, sphereId: Long): Boolean
+
+    suspend fun existsByIdAndUserId(userId: Long, sphereId: Long): Boolean
 }

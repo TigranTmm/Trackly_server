@@ -12,6 +12,7 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.jdbc.update
 
 class SphereRepositoryImpl : SphereRepository {
+
     override suspend fun createSphere(
         userId: Long,
         title: String,
@@ -124,6 +125,17 @@ class SphereRepositoryImpl : SphereRepository {
                 }
 
             row > 0
+        }
+    }
+
+    override suspend fun existsByIdAndUserId(userId: Long, sphereId: Long): Boolean {
+        return transaction {
+            val row = SpheresTable
+                .selectAll()
+                .where { (SpheresTable.userId eq userId) and (SpheresTable.sphereId eq sphereId) }
+                .singleOrNull()
+
+            row != null
         }
     }
 }
