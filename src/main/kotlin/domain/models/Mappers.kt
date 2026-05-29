@@ -1,6 +1,5 @@
 package com.example.domain.models
 
-import com.example.dto.session.SessionResponse
 import com.example.dto.sphere.SphereResponse
 import com.example.dto.task.TaskResponse
 
@@ -16,28 +15,11 @@ fun Sphere.toResponse(): SphereResponse {
 }
 
 
-/** Mapping Task to TaskResponse **/
+/** Mapping Sphere to SphereResponse **/
 fun Task.toResponse(): TaskResponse {
     return TaskResponse(
         content = content,
         priority = priority,
         isCompleted = isCompleted
-    )
-}
-
-
-/** Mapping Session to SessionResponse **/
-fun Session.toResponse(): SessionResponse {
-    return SessionResponse(
-        id = id,
-        sphereId = sphereId,
-        title = title,
-        comment = comment,
-        status = status.name,
-        planDurationSeconds = planDurationSeconds,
-        factualDurationSeconds = factualDurationSeconds,
-        pausedSeconds = pausedSeconds,
-        startedAt = startedAt?.toString(),
-        endedAt = endedAt?.toString()
     )
 }
