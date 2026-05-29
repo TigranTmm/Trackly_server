@@ -23,7 +23,7 @@ fun Route.taskRoutes(
         // Adding task
         post("/spheres/{id}/tasks") {
             try {
-                // Getting iser id
+                // Getting user id
                 val userId = call.getUserId()
                 // Getting sphere id
                 val sphereId = call.getIdFromRoute("id")
@@ -51,7 +51,7 @@ fun Route.taskRoutes(
         // Getting all tasks
         get("/spheres/{id}/tasks") {
             try {
-                // Getting iser id
+                // Getting user id
                 val userId = call.getUserId()
                 // Getting sphere id
                 val sphereId = call.getIdFromRoute("id")
@@ -72,7 +72,7 @@ fun Route.taskRoutes(
         // Getting task by id
         get("/spheres/{id}/tasks/{taskId}") {
             try {
-                // Getting iser id
+                // Getting user id
                 val userId = call.getUserId()
                 // Getting sphere id
                 val sphereId = call.getIdFromRoute("id")
@@ -94,7 +94,7 @@ fun Route.taskRoutes(
         // Updating task
         put("/spheres/{id}/tasks/{taskId}") {
             try {
-                // Getting iser id
+                // Getting user id
                 val userId = call.getUserId()
                 // Getting sphere id
                 val sphereId = call.getIdFromRoute("id")
@@ -125,7 +125,7 @@ fun Route.taskRoutes(
         // Deleting task
         delete("/spheres/{id}/tasks/{taskId}") {
             try {
-                // Getting iser id
+                // Getting user id
                 val userId = call.getUserId()
                 // Getting sphere id
                 val sphereId = call.getIdFromRoute("id")

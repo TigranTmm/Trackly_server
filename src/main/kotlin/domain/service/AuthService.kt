@@ -6,19 +6,19 @@ import com.example.domain.security.JWTConfig
 import com.example.domain.security.PasswordHasher
 
 class AuthService(
-    private val repository: UserRepository
+    private val userRepository: UserRepository
 ) {
 
     suspend fun register(
         email: String,
         password: String
     ): User {
-        val exists = repository.existsByEmail(email)
+        val exists = userRepository.existsByEmail(email)
 
         // Check if the email exists
         if (exists) throw IllegalArgumentException("UserWithThisEmailAlreadyExists")
 
-        return repository.createUser(
+        return userRepository.createUser(
             email = email,
             passwordHash = PasswordHasher.hash(password)
         )
@@ -29,7 +29,7 @@ class AuthService(
         password: String
     ): String {
         // Check if the user exists
-        val user = repository.getByEmail(email)
+        val user = userRepository.getByEmail(email)
             ?: throw IllegalArgumentException("UserWithThisEmailDoesNotExist")
 
         // Check if the password correct

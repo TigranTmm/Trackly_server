@@ -1,5 +1,6 @@
 package com.example.data
 
+import com.example.data.tables.SessionsTable
 import com.example.data.tables.SpheresTable
 import com.example.data.tables.TasksTable
 import com.example.data.tables.UsersTable
@@ -27,7 +28,7 @@ object DatabaseFactory {
         )
 
         transaction {
-            SchemaUtils.create(UsersTable, SpheresTable, TasksTable)
+            SchemaUtils.create(UsersTable, SpheresTable, TasksTable, SessionsTable)
         }
 
         println("Database connected")
