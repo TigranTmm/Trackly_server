@@ -38,4 +38,16 @@ interface SessionRepository {
     ): Session
 
     suspend fun deleteSession(sphereId: Long, sessionId: Long): Boolean
+
+    suspend fun getSessionsBetween(
+        sphereId: Long,
+        start: Instant,
+        end: Instant
+    ): List<Session>
+
+    suspend fun getUserSessionsBetween(
+        userId: Long,
+        start: Instant,
+        end: Instant
+    ): List<Session>
 }

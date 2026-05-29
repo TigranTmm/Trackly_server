@@ -15,6 +15,10 @@ import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.put
+import java.time.DayOfWeek
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.temporal.TemporalAdjusters
 
 fun Route.sessionRoutes(
     sessionService: SessionService
@@ -106,6 +110,54 @@ fun Route.sessionRoutes(
                 call.respond(HttpStatusCode.NoContent)
 
             } catch (e: IllegalArgumentException) {
+                call.respond(
+                    HttpStatusCode.BadRequest,
+                    e.message ?: ""
+                )
+            }
+        }
+
+        // Getting weekly sessions of sphere
+        get("/spheres/{id}/sessions/week") {
+            try {
+
+                // Getting user id
+                val userId = call.getUserId()
+
+                // Getting sphere id
+                val sphereId = call.getIdFromRoute("id")
+
+                val startOfWeek = Instant.now()
+                    .atZone(ZoneOffset.UTC)
+                    .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+                    .withHour(0)
+                    .withMinute(0)
+                    .withSecond(0)
+                    .withNano(0)
+                    .toInstant()
+
+                val endOfWeek = Instant.now()
+                    .atZone(ZoneOffset.UTC)
+                    .with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
+                    .withHour(23)
+                    .withMinute(59)
+                    .withSecond(59)
+                    .withNano(999999999)
+                    .toInstant()
+
+                val sessions = sessionService.getSessionsBetween(
+                    userId = userId,
+                    sphereId = sphereId,
+                    start = startOfWeek,
+                    end = endOfWeek
+                )
+
+                call.respond(
+                    sessions.map { it.toResponse() }
+                )
+
+            } catch (e: IllegalArgumentException) {
+
                 call.respond(
                     HttpStatusCode.BadRequest,
                     e.message ?: ""

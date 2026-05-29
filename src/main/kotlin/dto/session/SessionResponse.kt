@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SessionResponse(
     val id: Long,
+    val sphereId: Long,
     val title: String,
     val comment: String?,
     val status: String,

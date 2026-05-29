@@ -1,12 +1,17 @@
 package com.example.pluguns
 
+import com.example.data.repository.SessionRepositoryImpl
 import com.example.data.repository.SphereRepositoryImpl
 import com.example.data.repository.TaskRepositoryImpl
 import com.example.data.repository.UserRepositoryImpl
+import com.example.domain.service.AnalyticsService
 import com.example.domain.service.AuthService
+import com.example.domain.service.SessionService
 import com.example.domain.service.SphereService
 import com.example.domain.service.TaskService
+import com.example.routes.analyticsRoutes
 import com.example.routes.authRoutes
+import com.example.routes.sessionRoutes
 import com.example.routes.sphereRoutes
 import com.example.routes.taskRoutes
 import io.ktor.http.HttpStatusCode
@@ -31,12 +36,27 @@ fun Application.configureRouting() {
         sphereRepository = sphereRepository
     )
 
+    val sessionRepository = SessionRepositoryImpl()
+    val sessionService = SessionService(
+        sessionRepository = sessionRepository,
+        sphereRepository = sphereRepository
+    )
+
+    val analyticsService = AnalyticsService(
+        sessionRepository = sessionRepository,
+        sphereRepository = sphereRepository
+    )
+
     routing {
         authRoutes(authService)
 
         sphereRoutes(sphereService)
 
         taskRoutes(taskService)
+
+        sessionRoutes(sessionService)
+
+        analyticsRoutes(analyticsService)
 
         authenticate {
             get("/me") {

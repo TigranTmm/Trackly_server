@@ -30,6 +30,7 @@ fun Task.toResponse(): TaskResponse {
 fun Session.toResponse(): SessionResponse {
     return SessionResponse(
         id = id,
+        sphereId = sphereId,
         title = title,
         comment = comment,
         status = status.name,

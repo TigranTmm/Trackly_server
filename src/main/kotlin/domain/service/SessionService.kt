@@ -75,6 +75,35 @@ class SessionService(
         return true
     }
 
+    suspend fun getSessionsBetween(
+        userId: Long,
+        sphereId: Long,
+        start: Instant,
+        end: Instant
+    ): List<Session> {
+        // Check if sphere is existing
+        val isSphereValid = sphereRepository.existsByIdAndUserId(userId, sphereId)
+        if (!isSphereValid) throw IllegalArgumentException("SphereIsNotExist")
+
+        return sessionRepository.getSessionsBetween(
+            sphereId = sphereId,
+            start = start,
+            end = end
+        )
+    }
+
+    suspend fun getUserSessionsBetween(
+        userId: Long,
+        start: Instant,
+        end: Instant
+    ): List<Session> {
+        return sessionRepository.getUserSessionsBetween(
+            userId = userId,
+            start = start,
+            end = end
+        )
+    }
+
 
     /** Work with session states **/
 
@@ -160,6 +189,11 @@ class SessionService(
         // Check if session is existing
         var session = sessionRepository.getSessionById(sphereId, sessionId)
             ?: throw IllegalArgumentException("SessionIsNotExist")
+
+        // Check if comment is valid
+        if (comment != null && comment.length > 250) {
+            throw IllegalArgumentException("CommentIsTooLong")
+        }
 
         if (session.status == SessionStatus.ACTIVE || session.status == SessionStatus.PAUSED) {
             var totalPausedSeconds = session.pausedSeconds

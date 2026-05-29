@@ -1,10 +1,13 @@
 package com.example.data.repository
 
 import com.example.data.tables.SessionsTable
+import com.example.data.tables.SpheresTable
 import com.example.domain.models.Session
 import com.example.domain.models.SessionStatus
 import com.example.domain.repository.SessionRepository
+import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.and
+import org.jetbrains.exposed.v1.core.between
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.insert
@@ -35,7 +38,7 @@ class SessionRepositoryImpl : SessionRepository {
                 it[SessionsTable.status] = status.name
                 it[SessionsTable.planDurationSeconds] = planDurationSeconds
                 it[SessionsTable.factualDurationSeconds] = factualDurationSeconds
-                it[SessionsTable.pausedSeconds] = this.pausedSeconds
+                it[SessionsTable.pausedSeconds] = pausedSeconds
                 it[SessionsTable.pauseStartedAt] = pauseStartedAt
                 it[SessionsTable.startedAt] = startedAt
                 it[SessionsTable.endedAt] = endedAt
@@ -63,22 +66,8 @@ class SessionRepositoryImpl : SessionRepository {
             SessionsTable
                 .selectAll()
                 .where { SessionsTable.sphereId eq sphereId }
-                .map {
-                    Session(
-                        id = it[SessionsTable.sessionId],
-                        sphereId = it[SessionsTable.sphereId],
-                        title = it[SessionsTable.title],
-                        comment = it[SessionsTable.comment],
-                        status = SessionStatus.valueOf(it[SessionsTable.status]),
-                        planDurationSeconds = it[SessionsTable.planDurationSeconds],
-                        factualDurationSeconds = it[SessionsTable.factualDurationSeconds],
-                        pausedSeconds = it[SessionsTable.pausedSeconds],
-                        pauseStartedAt = it[SessionsTable.pauseStartedAt],
-                        startedAt = it[SessionsTable.startedAt],
-                        endedAt = it[SessionsTable.endedAt],
-                        createdAt = it[SessionsTable.createdAt]
-                    )
-                }
+                .orderBy(SessionsTable.createdAt to SortOrder.DESC)
+                .map { it.toSession() }
         }
     }
 
@@ -92,20 +81,7 @@ class SessionRepositoryImpl : SessionRepository {
                 .where { (SessionsTable.sphereId eq sphereId) and (SessionsTable.sessionId eq sessionId) }
                 .singleOrNull() ?: return@transaction null
 
-            Session(
-                id = row[SessionsTable.sessionId],
-                sphereId = row[SessionsTable.sphereId],
-                title = row[SessionsTable.title],
-                comment = row[SessionsTable.comment],
-                status = SessionStatus.valueOf(row[SessionsTable.status]),
-                planDurationSeconds = row[SessionsTable.planDurationSeconds],
-                factualDurationSeconds = row[SessionsTable.factualDurationSeconds],
-                pausedSeconds = row[SessionsTable.pausedSeconds],
-                pauseStartedAt = row[SessionsTable.pauseStartedAt],
-                startedAt = row[SessionsTable.startedAt],
-                endedAt = row[SessionsTable.endedAt],
-                createdAt = row[SessionsTable.createdAt]
-            )
+            row.toSession()
         }
 
     }
@@ -143,20 +119,7 @@ class SessionRepositoryImpl : SessionRepository {
                 .where { (SessionsTable.sphereId eq sphereId) and (SessionsTable.sessionId eq sessionId) }
                 .single()
 
-            Session(
-                id = row[SessionsTable.sessionId],
-                sphereId = row[SessionsTable.sphereId],
-                title = row[SessionsTable.title],
-                comment = row[SessionsTable.comment],
-                status = SessionStatus.valueOf(row[SessionsTable.status]),
-                planDurationSeconds = row[SessionsTable.planDurationSeconds],
-                factualDurationSeconds = row[SessionsTable.factualDurationSeconds],
-                pausedSeconds = row[SessionsTable.pausedSeconds],
-                pauseStartedAt = row[SessionsTable.pauseStartedAt],
-                startedAt = row[SessionsTable.startedAt],
-                endedAt = row[SessionsTable.endedAt],
-                createdAt = row[SessionsTable.createdAt]
-            )
+            row.toSession()
         }
     }
 
@@ -168,6 +131,43 @@ class SessionRepositoryImpl : SessionRepository {
                 }
 
             row > 0
+        }
+    }
+
+    override suspend fun getSessionsBetween(
+        sphereId: Long,
+        start: Instant,
+        end: Instant
+    ): List<Session> {
+        return transaction {
+            SessionsTable
+                .selectAll()
+                .where {
+                    (SessionsTable.sphereId eq sphereId) and
+                            (SessionsTable.status eq SessionStatus.COMPLETED.name) and
+                            (SessionsTable.startedAt.between(start, end))
+                }
+                .orderBy(SessionsTable.createdAt to SortOrder.DESC)
+                .map { it.toSession() }
+        }
+    }
+
+    override suspend fun getUserSessionsBetween(
+        userId: Long,
+        start: Instant,
+        end: Instant
+    ): List<Session> {
+        return transaction {
+            SessionsTable
+                .innerJoin(SpheresTable)
+                .selectAll()
+                .where {
+                    (SpheresTable.userId eq userId) and
+                            (SessionsTable.status eq SessionStatus.COMPLETED.name) and
+                            (SessionsTable.startedAt.between(start, end))
+                }
+                .orderBy(SessionsTable.startedAt to SortOrder.DESC)
+                .map { it.toSession() }
         }
     }
 }
